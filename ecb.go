@@ -11,6 +11,7 @@ func aes128ECB(ct, key []byte) []byte {
 	if err != nil {
 		panic(err)
 	}
+	ct = pad(ct, 16)
 	for i := 0; i < len(ct); i += 16 {
 		cipher.Decrypt(ct[i:i+16], ct[i:i+16])
 	}
