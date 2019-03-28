@@ -1,13 +1,22 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
-func RepeatingKeyXOR(in []byte, key []byte) []byte {
-	r := make([]byte, len(in))
+func xor(in, key, r []byte) []byte {
+	if len(in) != len(r) {
+		panic("Mismatched lengths in XOR")
+	}
 	for i := 0; i < len(in); i++ {
 		r[i] = in[i] ^ key[i%len(key)]
 	}
 	return r
+}
+
+func xorWithReturn(in, key []byte) []byte {
+	r := make([]byte, len(in))
+	return xor(in, key, r)
 }
 
 func BestCharXOR(in []byte) ([]byte, byte, float64) {
@@ -15,7 +24,7 @@ func BestCharXOR(in []byte) ([]byte, byte, float64) {
 	var bestOutput []byte
 	min := math.Inf(1)
 	for i := 0; i < 128; i++ {
-		xored := RepeatingKeyXOR([]byte(in), []byte{byte(i)})
+		xored := xorWithReturn([]byte(in), []byte{byte(i)})
 		score := EnglishScore(string(xored))
 		if score < min {
 			min = score
