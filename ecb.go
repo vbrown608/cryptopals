@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/aes"
+	"crypto/rand"
 )
 
 // Electronic Cookbook (ECB) mode encryption
@@ -18,6 +19,12 @@ func aes128ECB(ct, key []byte) []byte {
 	return ct
 }
 
+var fixedECBKey = make([]byte, 16)
+
+func fixedECB(ct []byte) []byte {
+	return aes128ECB(ct, fixedECBKey)
+}
+
 func countRepeats(in []byte) (count int) {
 	seen := map[string]bool{}
 	for i := 0; i < len(in); i += 16 {
@@ -28,4 +35,29 @@ func countRepeats(in []byte) (count int) {
 		seen[block] = true
 	}
 	return count
+}
+
+func BreakECB(secret []byte) []byte {
+	rand.Read(fixedECBKey)
+	var result []byte
+	for i := 0; i < len(secret); i++ {
+		b := getECBByte(result, secret)
+		result = append(result, b)
+	}
+	return result
+}
+
+func getECBByte(known []byte, ct []byte) byte {
+	targetLen := roundUpToMultiple(len(known)+1, 16)
+	padded := append(make([]byte, targetLen-len(known)-1), known...)
+	unknown := ct[len(known)]
+	want := fixedECB(append(padded, unknown))
+	for i := 0; i < 256; i++ {
+		got := fixedECB(append(padded, byte(i)))
+		if bytesEq(got, want) {
+			return byte(i)
+		}
+	}
+	panic("No match found")
+	return byte(0)
 }

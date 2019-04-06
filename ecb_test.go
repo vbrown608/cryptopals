@@ -45,3 +45,20 @@ func TestDecryptECB(t *testing.T) {
 		t.Fatal()
 	}
 }
+
+// Challenge 12
+func TestBreakECB(t *testing.T) {
+	secret, err := base64.StdEncoding.DecodeString(`Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK`)
+	if err != nil {
+		panic(err)
+	}
+	expected := `Rollin' in my 5.0
+With my rag-top down so my hair can blow
+The girlies on standby waving just to say hi
+Did you stop? No, I just drove by
+`
+	got := string(BreakECB(secret))
+	if expected != got {
+		t.Error(got)
+	}
+}
