@@ -23,7 +23,7 @@ func encryptionOracle(pt []byte) []byte {
 	// Choose a random cipher.
 	cipher := randInt(2)
 	if cipher == 0 {
-		return aes128ECB(pt, key)
+		return encryptECB(pt, key)
 	} else {
 		iv := make([]byte, 16)
 		rand.Read(iv)

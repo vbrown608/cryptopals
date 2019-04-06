@@ -3,11 +3,25 @@ package main
 import (
 	"crypto/aes"
 	"crypto/rand"
+	"fmt"
+	"net/url"
 )
 
 // Electronic Cookbook (ECB) mode encryption
 
-func aes128ECB(ct, key []byte) []byte {
+func encryptECB(ct, key []byte) []byte {
+	cipher, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+	ct = pad(ct, 16)
+	for i := 0; i < len(ct); i += 16 {
+		cipher.Encrypt(ct[i:i+16], ct[i:i+16])
+	}
+	return ct
+}
+
+func decryptECB(ct, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -22,7 +36,7 @@ func aes128ECB(ct, key []byte) []byte {
 var fixedECBKey = make([]byte, 16)
 
 func fixedECB(ct []byte) []byte {
-	return aes128ECB(ct, fixedECBKey)
+	return encryptECB(ct, fixedECBKey)
 }
 
 func countRepeats(in []byte) (count int) {

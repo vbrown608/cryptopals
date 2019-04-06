@@ -10,6 +10,7 @@ import (
 	"testing"
 )
 
+// Challenge 7
 func TestAES128ECB(t *testing.T) {
 	in, err := ioutil.ReadFile("files/7.txt")
 	if err != nil {
@@ -20,13 +21,14 @@ func TestAES128ECB(t *testing.T) {
 		t.Fatal(err)
 	}
 	key := []byte("YELLOW SUBMARINE")
-	pt := aes128ECB(ct, key)
+	pt := decryptECB(ct, key)
 	if !bytes.Contains(pt, []byte("Supercalafragilisticexpialidocious")) {
 		t.Fatal(string(pt))
 	}
 }
 
-func TestDecryptECB(t *testing.T) {
+// Challenge 8
+func TestDetectECB(t *testing.T) {
 	file, _ := os.Open("files/8.txt")
 	defer file.Close()
 
