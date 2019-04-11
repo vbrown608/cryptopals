@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math/big"
 )
 
@@ -36,17 +37,25 @@ func randInt(max int) int {
 // Implements PKCS#7 padding
 func pad(in []byte, size int) []byte {
 	target := len(in)
-	rem := len(in) % size
-	if rem > 0 {
-		target += size - rem
-	}
+	padS := size - (len(in) % size)
+	target += padS
 	r := make([]byte, target)
 	for i := 0; i < target; i++ {
 		if i < len(in) {
 			r[i] = in[i]
 		} else {
-			r[i] = '\x04'
+			r[i] = byte(padS)
 		}
 	}
 	return r
+}
+
+func unpad(in []byte) ([]byte, error) {
+	padS := int(in[len(in)-1])
+	for i := 0; i < padS; i++ {
+		if in[len(in)-padS+i] != byte(padS) {
+			return []byte{}, fmt.Errorf("Invalid padding")
+		}
+	}
+	return in[0 : len(in)-padS], nil
 }
